@@ -1,12 +1,13 @@
 use std::{collections::HashMap, time};
 
-use crate::config::middleware_config::Middleware;
 use crate::types;
+
+use super::http_middleware_config::HTTPMiddlewareConfig;
 
 pub struct HTTPConfiguration {
     pub routers: HashMap<String, Box<Router>>,
     pub services: HashMap<String, Box<Service>>,
-    pub middlewares: HashMap<String, Box<Middleware>>,
+    pub middlewares: HashMap<String, Box<HTTPMiddlewareConfig>>,
     pub models: HashMap<String, Box<Model>>,
     pub servers_transports: HashMap<String, Box<ServersTransport>>,
 }

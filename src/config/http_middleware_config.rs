@@ -1,3 +1,3 @@
-pub struct Middleware {
+pub struct HTTPMiddlewareConfig {
     // todo: add middleware config structures
 }
