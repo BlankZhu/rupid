@@ -1,47 +1,54 @@
 use std::{collections::HashMap, time};
 
-use crate::types;
+use serde::{Deserialize, Serialize};
 
 use super::http_middleware_config::HTTPMiddlewareConfig;
+use crate::types;
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct HTTPConfiguration {
-    pub routers: HashMap<String, Box<Router>>,
-    pub services: HashMap<String, Box<Service>>,
-    pub middlewares: HashMap<String, Box<HTTPMiddlewareConfig>>,
-    pub models: HashMap<String, Box<Model>>,
-    pub servers_transports: HashMap<String, Box<ServersTransport>>,
+    pub routers: HashMap<String, Router>,
+    pub services: HashMap<String, Service>,
+    pub middlewares: HashMap<String, HTTPMiddlewareConfig>,
+    pub models: HashMap<String, Model>,
+    pub servers_transports: HashMap<String, ServersTransport>,
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Model {
     pub middlewares: Vec<String>,
-    pub tls: Box<RouterTSLConfig>,
+    pub tls: RouterTSLConfig,
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Service {
-    pub load_balancer: Box<ServersLoadBalancer>,
-    pub weighted: Box<WeightedRoundRobin>,
-    pub mirroring: Box<Mirroring>,
+    pub load_balancer: ServersLoadBalancer,
+    pub weighted: WeightedRoundRobin,
+    pub mirroring: Mirroring,
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Router {
     pub entry_points: Vec<String>,
     pub middlewares: Vec<String>,
     pub service: String,
     pub priority: i64,
-    pub tls: Box<RouterTSLConfig>,
+    pub tls: RouterTSLConfig,
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct RouterTSLConfig {
     pub options: String,
     pub cert_resolver: String,
     pub domains: Vec<types::domain::Domain>,
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Mirroring {
     pub service: String,
     pub max_body_size: i64,
     pub mirrors: MirrorService,
-    pub health_check: Box<HealthCheck>,
+    pub health_check: HealthCheck,
 }
 
 impl Mirroring {
@@ -50,17 +57,20 @@ impl Mirroring {
     }
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct MirrorService {
     pub name: String,
     pub precent: i64,
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct WeightedRoundRobin {
-    pub services: Vec<WRService>,
-    pub sticky: Box<Sticky>,
-    pub health_check: Box<HealthCheck>,
+    pub services: WRService,
+    pub sticky: Sticky,
+    pub health_check: HealthCheck,
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct WRService {
     pub name: String,
     pub weight: i64,
@@ -72,10 +82,12 @@ impl WRService {
     }
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Sticky {
-    pub cookie: Box<Cookie>,
+    pub cookie: Cookie,
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Cookie {
     pub name: String,
     pub secure: bool,
@@ -83,12 +95,13 @@ pub struct Cookie {
     pub same_site: String,
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ServersLoadBalancer {
-    pub sticky: Box<Sticky>,
+    pub sticky: Sticky,
     pub servers: Vec<Server>,
-    pub health_check: Box<HealthCheck>,
+    pub health_check: HealthCheck,
     pub pass_host_header: bool,
-    pub response_forwarding: Box<ResponseForwarding>,
+    pub response_forwarding: ResponseForwarding,
     pub servvers_transport: String,
 }
 
@@ -104,10 +117,12 @@ impl ServersLoadBalancer {
     }
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ResponseForwarding {
     pub flush_internal: String,
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Server {
     pub url: String,
     pub scheme: String,
@@ -120,6 +135,7 @@ impl Server {
     }
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ServerHealthCheck {
     pub scheme: String,
     pub path: String,
@@ -136,8 +152,10 @@ impl ServerHealthCheck {
     }
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct HealthCheck {}
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ServersTransport {
     pub server_name: String,
     pub insecure_skip_verify: bool,
@@ -148,6 +166,7 @@ pub struct ServersTransport {
     pub peer_cert_uri: String,
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ForwardingTimeout {
     pub dial_timeout: time::Duration,
     pub response_header_timeout: time::Duration,

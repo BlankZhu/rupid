@@ -1,4 +1,7 @@
+use serde::{Deserialize, Serialize};
+
 // Domain holds a domain name with SANs
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Domain {
     pub main: String,      // default subject name
     pub sans: Vec<String>, // subject alternative names

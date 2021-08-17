@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct HTTPMiddlewareConfig {
+pub struct UDPMiddlewareConfig {
     // todo: add middleware config structures
 }
