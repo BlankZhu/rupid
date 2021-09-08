@@ -2,17 +2,13 @@ mod api;
 mod config;
 mod engine;
 mod healthcheck;
-mod ip;
 mod log;
 mod middleware;
 mod option;
-mod ping;
 mod rule;
 mod server;
-mod tcp;
 mod tls;
 mod types;
-mod udp;
 
 use std::io;
 use clap::Clap;

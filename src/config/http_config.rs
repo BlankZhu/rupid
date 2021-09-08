@@ -7,10 +7,10 @@ use crate::types;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct HTTPConfiguration {
-    pub routers: HashMap<String, Router>,
-    pub services: HashMap<String, Service>,
-    pub middlewares: HashMap<String, HTTPMiddlewareConfig>,
-    pub models: HashMap<String, Model>,
+    pub routers: HashMap<String, Router>,   // path to Router
+    pub services: HashMap<String, Service>, // upstream service name to Service
+    pub middlewares: HashMap<String, HTTPMiddlewareConfig>, // middleware name to Middleware
+    pub models: HashMap<String, Model>, // 
     pub servers_transports: HashMap<String, ServersTransport>,
 }
 
