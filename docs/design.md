@@ -4,10 +4,10 @@
 
 ```
 1. Acceptor
-2. Router(Handler)
-3. Filters(Filter Chain, or Route)
+2. Router
+3. Pipeline
 4. Proxy
-5. Upstream Services
+5. Service
 ```
 
 ### Acceptor
@@ -16,19 +16,17 @@
 
 Acceptor should be able to handle HTTPS request from client.
 
-### Router(Handler)
+### Router
 
-`Router` (or handler) will check if the HTTP request is valid, create `RupidContext`, call the global `filter` chain and the custom filter chain.
+`Router` will check if the HTTP request is valid, create `RupidContext`, call the global `Pipeline` and the custom `Pipeline`.
 
-### Filters(Filter Chain)
+### Pipeline
 
-`Filters` will pre-process the request, or intercept, or post-process the response, which works like a HTTP middleware but with a lot of combinable logics.
+`Pipeline` is a series of plugins, which will pre-process the request, or intercept, or post-process the response, which works like a HTTP middleware but with a lot of combinable logics.
 
-`PredicateFilter` will handle the request/response according to its `Predicate`.
+### Plugin
 
-`ThrottleFilter` will throttle the request.
-
-`CircuitBreakerFilter` will make a service-downgrade if upstream services are not in good condition.
+`Plugin` is a HTTP middleware, which may provide URL override, authentication, throttle, circuit break or any other abilities.
 
 ### Proxy
 
@@ -36,13 +34,13 @@ Acceptor should be able to handle HTTPS request from client.
 
 `Proxy` should be able to handle HTTPS to the upstream services.
 
-### Upstream Service
+### Service
 
-`UpstreamService` describes the upstream services behind `Rupid`.
+`Service` describes the upstream services behind `Rupid`.
 
 ### Gateway Constructor
 
-`GatewayConstructor` constructs the `Rupid` from parameters by setting up `Acceptor`, `Router`, `Filters`, `Proxy` and chain them together.
+`GatewayConstructor` constructs the `Rupid` from parameters by setting up `Acceptor`, `Router`, `Pipeline`, `Plugin`, `Proxy`, `Service `and chain them together.
 
 ## Data Structure
 
@@ -83,24 +81,24 @@ Router:
 
 
 
-### Filters
+### Pipeline
 
 ```yaml
-Filters:
-	name: filter_chain_name
-	filter_list:
-		- filter_a
-		- filter_b
+Pipeline:
+	name: pipeline_name
+	plugin_list:
+		- plugin_a
+		- plugin_b
 ```
 
 
 
-### Filter
+### Plugin
 
 ```yaml
-Filter:
-	name: filer_name
-	predicate: "(TODO)"
+Plugin:
+	name: plugin_name
+	field: "(TODO)"
 ```
 
 
@@ -114,7 +112,7 @@ Proxy:
 
 
 
-### Upstream Service
+### Service
 
 ```yaml
 Service:

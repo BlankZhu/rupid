@@ -1,13 +1,14 @@
 mod api;
 mod config;
-mod engine;
-mod healthcheck;
+mod constant;
 mod log;
-mod middleware;
 mod option;
-mod rule;
+mod pipeline;
+mod plugin;
+mod proxy;
+mod router;
 mod server;
-mod tls;
+mod service;
 mod types;
 
 use std::io;
@@ -19,10 +20,10 @@ async fn main() -> io::Result<()> {
     let opt = option::Options::parse();
     
     // read config
-    let conf = config::RupidConfig::load_from_yaml_file(&opt.config)?;
+    // ...
 
     // setup proxy engine
-    let _ = engine::RupidEngine::new(&conf);
+    // ...
 
     Ok(())
 }
