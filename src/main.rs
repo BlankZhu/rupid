@@ -1,13 +1,12 @@
 mod config;
+mod constants;
+mod error;
 mod option;
 mod server;
 mod types;
 
-use clap::Clap;
-use std::io;
-
 #[tokio::main]
-async fn main() -> io::Result<()> {
+async fn main() -> std::io::Result<()> {
     // parse command line options
     // ...
 
