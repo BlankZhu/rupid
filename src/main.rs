@@ -7,13 +7,13 @@ mod types;
 
 use clap::Clap;
 use config::Config;
-use log::error;
+use log::{error, info};
 use option::Option;
 
 #[tokio::main]
 async fn main() {
     if std::env::var_os("RUST_LOG").is_none() {
-        std::env::set_var("RUST_LOG", "todos=info");
+        std::env::set_var("RUST_LOG", "trace");
     }
     pretty_env_logger::init();
 
@@ -28,6 +28,7 @@ async fn main() {
             return;
         }
     };
+    info!("using config: {:?}", conf);
 
     // todo: setup rupid server...
 }

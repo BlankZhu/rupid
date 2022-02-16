@@ -46,8 +46,8 @@ pub struct Proxy {
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Log {
     pub to_std_out: Option<bool>,
-    pub to_file: Option<bool>,         // not avaliable now
-    pub log_file_path: Option<String>, // not avaliable now
+    pub to_file: Option<bool>,        // not avaliable now
+    pub log_filename: Option<String>, // not avaliable now
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -62,14 +62,14 @@ pub struct Entrance {
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Middleware {
     pub name: String,
-    pub parameters: Option<Vec<String>>,
+    pub parameters: Option<String>,
     // todo
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct LoadBalancer {
     pub name: String,
-    pub parameters: Option<Vec<String>>,
+    pub parameters: Option<String>,
     // todo
 }
 
