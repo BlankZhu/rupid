@@ -1,6 +1,7 @@
-const RUPID_CONFIG_DEFAULT_BIND_ADDRESS: [i32; 4] = [127, 0, 0, 1];
-const RUPID_CONFIG_DEFAULT_PORT: u16 = 7777;
-const RUPID_CONFIG_DEFAULT_USE_SSL: bool = false;
+const RUPID_CONFIG_SERVER_DEFAULT_BIND_ADDRESS: [i32; 4] = [127, 0, 0, 1];
+const RUPID_CONFIG_SERVER_DEFAULT_PORT: u16 = 7777;
+const RUPID_CONFIG_SERVER_DEFAULT_TIMEOUT: u64 = 7000; // in micro second
+const RUPID_CONFIG_SERVER_DEFAULT_USE_SSL: bool = false;
 
 // proxy config related
 const RUPID_CONFIG_PROXY_DEFAULT_LOAD_BALANCER: &str = "roundrobin";
@@ -19,5 +20,6 @@ const RUPID_CONFIG_PROXY_LOAD_BALANCER_ROUND_ROBIN: &str = "roundrobin";
 // todo...
 
 // backend config related
-const RUPID_CONFIG_DEFAULT_BACKEND_USE_SSL: bool = false;
-const RUPID_CONFIG_DEFAULT_BACKEND_METHOD: &str = "PRESERVE";
+const RUPID_CONFIG_BACKEND_DEFAULT_USE_SSL: bool = false;
+const RUPID_CONFIG_BACKEND_DEFAULT_METHOD: &str = "PRESERVE";
+const RUPID_CONFIG_BACKEND_DEFAULT_TIMEOUT: u64 = 5000; // in micro second
