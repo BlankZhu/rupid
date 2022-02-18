@@ -33,19 +33,6 @@ async fn main() {
     };
     info!("using config: {:?}", conf);
 
-    // let routes = httpbin_org_api();
-    // let svc = warp::service(routes);
-    // let make_svc = warp::hyper::service::make_service_fn(move |_| async move {
-    //     Ok::<_, std::convert::Infallible>(svc)
-    // });
-    // let err = warp::hyper::Server::bind(&([127, 0, 0, 1], 3030).into())
-    //     .serve(make_svc)
-    //     .await;
-    // match err {
-    //     Ok(_) => return,
-    //     Err(e) => panic!("{}", e),
-    // }
-
     let routes = httpbin_org_api();
     let service = warp::service(routes);
     let make_service = warp::hyper::service::make_service_fn(move |_| async move {
