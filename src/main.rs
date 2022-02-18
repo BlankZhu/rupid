@@ -36,6 +36,7 @@ async fn main() {
     let routes = httpbin_org_api();
     let service = warp::service(routes);
     let make_service = warp::hyper::service::make_service_fn(move |_| async move {
+        // need a error handler in HTTP layer
         let service = tower::ServiceBuilder::new()
             .timeout(std::time::Duration::from_millis(10))
             .service(service);
