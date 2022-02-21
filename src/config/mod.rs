@@ -40,7 +40,6 @@ pub struct Server {
 pub struct Proxy {
     pub entrances: Vec<Entrance>,
     pub middlewares: Option<Vec<Middleware>>,
-    pub load_balancer: Option<LoadBalancer>,
     pub backends: Option<Vec<Backend>>,
 }
 
@@ -62,13 +61,6 @@ pub struct Entrance {
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Middleware {
-    pub name: String,
-    pub parameters: Option<String>,
-    // todo
-}
-
-#[derive(Debug, Deserialize, Serialize)]
-pub struct LoadBalancer {
     pub name: String,
     pub parameters: Option<String>,
     // todo

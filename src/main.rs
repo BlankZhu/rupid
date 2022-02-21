@@ -38,6 +38,7 @@ async fn main() {
     let make_service = warp::hyper::service::make_service_fn(move |_| async move {
         // need a error handler in HTTP layer
         let service = tower::ServiceBuilder::new()
+            // .layer(inner: S) translate next layer's timeout into Gateway-Timeout
             .timeout(std::time::Duration::from_millis(10))
             .service(service);
         Ok::<_, std::convert::Infallible>(service)
