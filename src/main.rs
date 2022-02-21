@@ -5,7 +5,7 @@ mod option;
 mod server;
 mod types;
 
-use clap::Clap;
+use clap::Parser;
 use config::Config;
 use futures::TryStreamExt;
 use http;
