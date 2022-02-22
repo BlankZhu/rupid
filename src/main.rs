@@ -8,10 +8,9 @@ mod types;
 use clap::Parser;
 use config::Config;
 use futures::TryStreamExt;
-use http;
+use http::{self, HeaderMap};
 use log::{error, info};
 use option::Option;
-use warp::Filter;
 
 #[tokio::main]
 async fn main() {
@@ -33,70 +32,53 @@ async fn main() {
     };
     info!("using config: {:?}", conf);
 
-    let routes = httpbin_org_api();
-    let service = warp::service(routes);
-    let make_service = warp::hyper::service::make_service_fn(move |_| async move {
-        // need a error handler in HTTP layer
-        let service = tower::ServiceBuilder::new()
-            // .layer(inner: S) translate next layer's timeout into Gateway-Timeout
-            .timeout(std::time::Duration::from_millis(10))
-            .service(service);
-        Ok::<_, std::convert::Infallible>(service)
-    });
-    let server = warp::hyper::Server::bind(&([127, 0, 0, 1], 7777).into()).serve(make_service);
-    server.await;
+    let app = axum::Router::new().route("/:word", axum::routing::get(httpbin_org_handler));
+    axum::Server::bind(&"0.0.0.0:7777".parse().unwrap())
+        .serve(app.into_make_service())
+        .await
+        .unwrap();
 }
 
-fn httpbin_org_api(
-) -> impl Filter<Extract = impl warp::Reply, Error = warp::Rejection> + Clone + Copy {
-    warp::method()
-        .and(warp::filters::path::full())
-        .and(warp::header::headers_cloned())
-        .and(warp::body::stream())
-        .and_then(httpbin_org_callback)
-}
+async fn httpbin_org_handler(
+    method: axum::http::Method,
+    axum::extract::Path(word): axum::extract::Path<String>,
+    headers: HeaderMap,
+    axum::extract::RawBody(body): axum::extract::RawBody,
+) -> http::Response<hyper::body::Body> {
+    let request = build_httpbin_org_request(method, format!("{}", word.as_str()), headers, body);
+    let client = hyper::Client::new();
 
-async fn httpbin_org_callback(
-    method: http::Method,
-    path: warp::filters::path::FullPath,
-    headers: http::HeaderMap,
-    body: impl futures::Stream<Item = Result<impl bytes::buf::Buf, warp::Error>> + Send + 'static,
-) -> Result<http::Response<warp::hyper::body::Body>, warp::Rejection> {
-    let request = httpbin_org_build_request(method, format!("{}", path.as_str()), headers, body);
-    let client = warp::hyper::Client::new();
+    if let Ok(upstream_response) = client.request(request).await {
+        let upstream_status = upstream_response.status();
+        let upstream_headers = upstream_response.headers().clone();
+        let upstream_body = upstream_response.into_body();
 
-    if let Ok(proxy_response) = client.request(request).await {
-        let proxy_status = proxy_response.status();
-        let proxy_headers = proxy_response.headers().clone();
-        let proxy_body = proxy_response.into_body();
-
-        let mut response = http::Response::new(proxy_body);
-        *response.status_mut() = proxy_status;
-        *response.headers_mut() = proxy_headers;
-
-        Ok(response)
+        let mut response = http::Response::new(upstream_body);
+        *response.status_mut() = upstream_status;
+        *response.headers_mut() = upstream_headers;
+        response
     } else {
-        Ok(http::Response::builder()
+        http::Response::builder()
             .status(http::StatusCode::SERVICE_UNAVAILABLE)
             .body("proxy server unavailable".into())
-            .unwrap())
+            .unwrap()
     }
 }
 
-fn httpbin_org_build_request(
+fn build_httpbin_org_request(
     method: http::Method,
     path: String,
-    headers: http::HeaderMap,
-    body: impl futures::Stream<Item = Result<impl bytes::Buf, warp::Error>> + Send + 'static,
-) -> http::Request<warp::hyper::Body> {
+    headers: HeaderMap,
+    body: hyper::body::Body,
+) -> http::Request<hyper::body::Body> {
     let uri = format!("http://httpbin.org:80/{}", path.as_str());
-    let body = body.map_ok(|mut buf| buf.copy_to_bytes(buf.remaining()));
-    let mut request = http::Request::new(warp::hyper::Body::wrap_stream(body));
+    let mut request = http::Request::new(body);
     *request.method_mut() = method;
     *request.uri_mut() = uri.parse().unwrap();
     *request.headers_mut() = headers;
     request
         .headers_mut()
         .insert(http::header::HOST, "httpbin.org".parse().unwrap());
+
     request
 }
