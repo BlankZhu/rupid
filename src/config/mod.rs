@@ -76,4 +76,6 @@ pub struct Backend {
     pub certificate: Option<String>,
     pub method: Option<String>, // GET, POST, ... and `PRESERVE`
     pub target: String,
+    pub keep_alive: bool,
+    pub pool_size: u64,
 }
