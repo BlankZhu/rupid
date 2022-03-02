@@ -1,5 +1,5 @@
 mod config;
-mod constants;
+pub mod constants;
 mod error;
 mod option;
 mod server;

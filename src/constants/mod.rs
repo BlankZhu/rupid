@@ -1,25 +1,28 @@
-const RUPID_CONFIG_SERVER_DEFAULT_BIND_ADDRESS: [i32; 4] = [127, 0, 0, 1];
-const RUPID_CONFIG_SERVER_DEFAULT_PORT: u16 = 7777;
-const RUPID_CONFIG_SERVER_DEFAULT_TIMEOUT: u64 = 7000; // in milli second
-const RUPID_CONFIG_SERVER_DEFAULT_USE_SSL: bool = false;
+pub const RUPID_CONFIG_SERVER_DEFAULT_BIND_ADDRESS: [i32; 4] = [127, 0, 0, 1];
+pub const RUPID_CONFIG_SERVER_DEFAULT_PORT: u16 = 7777;
+pub const RUPID_CONFIG_SERVER_DEFAULT_TIMEOUT: std::time::Duration =
+    std::time::Duration::from_millis(7000);
+pub const RUPID_CONFIG_SERVER_DEFAULT_USE_SSL: bool = false;
 
 // proxy config related
-const RUPID_CONFIG_PROXY_DEFAULT_LOAD_BALANCER: &str = "roundrobin";
+pub const RUPID_CONFIG_PROXY_DEFAULT_LOAD_BALANCER: &str = "roundrobin";
 
 // log config realted
-const RUPID_CONFIG_PROXY_LOG_DEFAULT_TO_STD_OUT: bool = true;
+pub const RUPID_CONFIG_PROXY_LOG_DEFAULT_TO_STD_OUT: bool = true;
 
 // entrace config related
-const RUPID_CONFIG_PROXY_ENTRANCE_DEFAULT_METHOD: &str = "ALL";
+pub const RUPID_CONFIG_PROXY_ENTRANCE_DEFAULT_METHOD: &str = "ALL";
 
 // middleware config related
 // todo...
 
 // load balancer config related
-const RUPID_CONFIG_PROXY_LOAD_BALANCER_ROUND_ROBIN: &str = "roundrobin";
+pub const RUPID_CONFIG_PROXY_LOAD_BALANCER_ROUND_ROBIN: &str = "roundrobin";
 // todo...
 
 // backend config related
-const RUPID_CONFIG_BACKEND_DEFAULT_USE_SSL: bool = false;
-const RUPID_CONFIG_BACKEND_DEFAULT_METHOD: &str = "PRESERVE";
-const RUPID_CONFIG_BACKEND_DEFAULT_TIMEOUT: u64 = 5000; // in milli second
+pub const RUPID_CONFIG_BACKEND_DEFAULT_PORT: u16 = 80;
+pub const RUPID_CONFIG_BACKEND_DEFAULT_USE_SSL: bool = false;
+pub const RUPID_CONFIG_BACKEND_DEFAULT_METHOD: &str = "PRESERVE";
+pub const RUPID_CONFIG_BACKEND_DEFAULT_TIMEOUT: std::time::Duration =
+    std::time::Duration::from_millis(5000);

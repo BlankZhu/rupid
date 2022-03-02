@@ -76,6 +76,6 @@ pub struct Backend {
     pub certificate: Option<String>,
     pub method: Option<String>, // GET, POST, ... and `PRESERVE`
     pub target: String,
-    pub keep_alive: bool,
-    pub concurrency_limit: u64,
+    pub keep_alive: Option<bool>,
+    pub concurrency_limit: Option<u64>,
 }

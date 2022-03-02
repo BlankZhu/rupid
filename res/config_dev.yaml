@@ -19,7 +19,7 @@ servers:
             host: httpbin.org
             port: 443
             timeout: 3000
-            user_ssl: true
+            use_ssl: true
             # certificate: /path/to/certificate # use default cert
             method: GET
             target: /get
