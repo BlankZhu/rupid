@@ -1,6 +1,7 @@
 servers:
   - address: 127.0.0.1
     port: 7777
+    timeout: 5000
     use_ssl: false
     private_key: path/to/private/key
     certificate: path/to/certificate
@@ -11,20 +12,18 @@ servers:
             method: ALL
             target: /api-1
         middleware:
-          name: middleware-1
-          parameters: k1=v1,k2=v2
-        load_balancer:
-          name: load_balancer-1
-          parameters: k1=v1,k2=v2
+          - name: middleware-1
+            parameters: k1=v1,k2=v2
         backends:
           - name: backend-1
             host: backend-1.com
             port: 443
+            timeout: 3000
             user_ssl: true
             certificate: /path/to/certificate
             method: PRESERVE
             target: /backend/api-1
     log:
       to_std_out: true
-      to_file: true
+      to_file: false
       log_filename: path/to/log

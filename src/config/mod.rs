@@ -28,7 +28,7 @@ impl Config {
 pub struct Server {
     pub address: Option<String>,
     pub port: Option<u16>,
-    pub timeout: Option<u64>, // in micro second
+    pub timeout: Option<u64>, // in milli second
     pub use_ssl: Option<bool>,
     pub private_key: Option<String>,
     pub certificate: Option<String>, // todo: certificate bundle
@@ -71,11 +71,11 @@ pub struct Backend {
     pub name: String,
     pub host: String,
     pub port: Option<String>,
-    pub timeout: Option<u64>, // in micro second
+    pub timeout: Option<u64>, // in milli second
     pub use_ssl: Option<bool>,
     pub certificate: Option<String>,
     pub method: Option<String>, // GET, POST, ... and `PRESERVE`
     pub target: String,
     pub keep_alive: bool,
-    pub pool_size: u64,
+    pub concurrency_limit: u64,
 }
