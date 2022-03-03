@@ -13,15 +13,34 @@ use hyper::{Body, Request, Response};
 use std::convert::Infallible;
 use tower::service_fn;
 
+#[derive(Debug)]
 pub struct Proxy {
     entrances: Vec<entrance::Entrance>,
-    middlewares: Vec<Box<dyn middleware::Middleware>>,
+    // middlewares: Vec<Box<dyn middleware::Middleware>>,
     backends: Vec<backend::Backend>,
 }
 
 impl Proxy {
     pub fn new(config: config::Proxy) -> Self {
-        todo!()
+        let mut entrances = Vec::new();
+        // let mut middlewares = Vec::new();
+        let mut backends = Vec::new();
+
+        for e in config.entrances {
+            let entrance = Entrance::new(e);
+            entrances.push(entrance);
+        }
+        // todo: for m in config.middlewares...
+        for b in config.backends {
+            let backend = Backend::new(b);
+            backends.push(backend);
+        }
+
+        Proxy {
+            entrances,
+            // middlewares,
+            backends,
+        }
     }
 
     pub fn generate_router(&self) -> Router<Body> {

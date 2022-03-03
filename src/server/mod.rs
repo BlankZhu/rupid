@@ -2,7 +2,9 @@ mod proxy;
 
 use warp::Filter;
 
-use crate::Config;
+use crate::config;
+
+use self::proxy::Proxy;
 
 #[derive(Debug)]
 pub struct Server {
@@ -10,11 +12,11 @@ pub struct Server {
     addr: [u8; 4],
     timeout: std::time::Duration,
     use_ssl: bool,
-    // proxies:
+    proxies: Vec<Proxy>,
 }
 
 impl Server {
-    fn new(conf: Config) -> Self {
+    fn new(conf: config::Server) -> Self {
         todo!()
     }
 

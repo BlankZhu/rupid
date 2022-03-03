@@ -40,7 +40,7 @@ pub struct Server {
 pub struct Proxy {
     pub entrances: Vec<Entrance>,
     pub middlewares: Option<Vec<Middleware>>,
-    pub backends: Option<Vec<Backend>>,
+    pub backends: Vec<Backend>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
