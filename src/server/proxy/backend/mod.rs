@@ -1,10 +1,14 @@
 use crate::config;
-use crate::constants;
-use futures::TryStreamExt;
-use hyper::{client, http, Client};
+use crate::constants::*;
+use http::uri;
+use hyper::client::HttpConnector;
+use hyper::{http, Body, Client, Request, Response, StatusCode};
 use log::{error, warn};
 use std::str::FromStr;
-use std::time;
+use std::time::Duration;
+
+type GenericError = Box<dyn std::error::Error + Send + Sync>;
+type Result<T> = std::result::Result<T, GenericError>;
 
 #[derive(Debug)]
 pub struct Backend {
@@ -16,26 +20,27 @@ pub struct Backend {
     method: http::Method,
     target: String,
 
-    client: Client<client::HttpConnector>,
+    client: Client<HttpConnector>,
 }
 
 impl Backend {
     pub fn new(config: config::Backend) -> Self {
         let port: u16 = config.port.map_or(
-            constants::RUPID_CONFIG_BACKEND_DEFAULT_PORT,
+            RUPID_CONFIG_BACKEND_DEFAULT_PORT,
             |port_str: String| match port_str.parse::<u16>() {
                 Ok(p) => p,
                 Err(e) => {
                     warn!("invalid port: {}, using 80", &port_str);
-                    constants::RUPID_CONFIG_BACKEND_DEFAULT_PORT
+                    RUPID_CONFIG_BACKEND_DEFAULT_PORT
                 }
             },
         );
 
-        let timeout: time::Duration = config.timeout.map_or(
-            constants::RUPID_CONFIG_BACKEND_DEFAULT_TIMEOUT,
-            |timeout: u64| time::Duration::from_millis(timeout),
-        );
+        let timeout: Duration = config
+            .timeout
+            .map_or(RUPID_CONFIG_BACKEND_DEFAULT_TIMEOUT, |timeout: u64| {
+                Duration::from_millis(timeout)
+            });
 
         let use_ssl: bool = config.use_ssl.map_or(false, |b| b);
 
@@ -68,37 +73,47 @@ impl Backend {
         }
     }
 
-    async fn callback(
-        &self,
-        method: http::Method,
-        path: warp::path::FullPath,
-        headers: http::HeaderMap,
-        body: impl futures::Stream<Item = Result<impl bytes::Buf, warp::Error>> + Send + 'static,
-    ) -> http::Response<hyper::Body> {
-        let uri = format!(
-            "http://{}:{}{}",
-            self.host.clone().as_str(),
-            self.port.clone(),
-            path.as_str()
-        );
-        let body = body.map_ok(|mut buf| buf.copy_to_bytes(buf.remaining()));
-        let mut request = http::Request::new(warp::hyper::Body::wrap_stream(body));
-        *request.method_mut() = method;
-        *request.uri_mut() = uri.parse().unwrap();
-        *request.headers_mut() = headers;
-        request
-            .headers_mut()
-            .insert(http::header::HOST, self.host.as_str().parse().unwrap());
+    pub async fn exec(&self, req: Request<Body>) -> Response<Body> {
+        // todo: convert Error into HTTP 5XX response
+        let res = self.request(req).await;
+        match res {
+            Ok(res) => return res,
+            Err(err) => {
+                let err_resp = Response::builder()
+                    .status(StatusCode::INTERNAL_SERVER_ERROR)
+                    .body(Body::from(format!("{}", err)))
+                    .unwrap();
+                error!("failed to execute HTTP request, detail: {}", err);
+                return err_resp;
+            }
+        }
+    }
 
-        let response = self.client.request(request).await;
-        let ret = match response {
-            Ok(response) => response,
-            Err(e) => http::Response::builder()
-                .status(http::StatusCode::INTERNAL_SERVER_ERROR)
-                .body(format!("{}", e).into())
-                .unwrap(),
+    async fn request(&self, req: Request<Body>) -> Result<Response<Body>> {
+        let scheme = match self.use_ssl {
+            ture => "https",
+            false => "http",
         };
+        let query = req.uri().query().map_or("", |q| q).to_string();
+        let mut headers = req.headers().clone();
+        // fixme: carefully select header fields to override
+        headers.insert(http::header::HOST, self.host.as_str().parse().unwrap());
+        let body = hyper::body::to_bytes(req).await?;
+        let body = Body::from(body);
 
-        return ret;
+        let new_uri = uri::Builder::new()
+            .scheme(scheme)
+            .authority(format!("{}:{}", self.name.clone(), self.port.clone()))
+            .path_and_query(format!("{}{}", self.target.clone(), query))
+            .build()?;
+
+        let mut new_request = Request::builder()
+            .method(self.method.clone())
+            .uri(new_uri)
+            .body(body)?;
+        *new_request.headers_mut() = headers;
+
+        let response = self.client.request(new_request).await?;
+        Ok(response)
     }
 }
