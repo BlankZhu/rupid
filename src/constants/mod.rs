@@ -21,8 +21,8 @@ pub const RUPID_CONFIG_PROXY_LOAD_BALANCER_ROUND_ROBIN: &str = "roundrobin";
 // todo...
 
 // backend config related
-pub const RUPID_CONFIG_BACKEND_DEFAULT_PORT: u16 = 80;
-pub const RUPID_CONFIG_BACKEND_DEFAULT_USE_SSL: bool = false;
-pub const RUPID_CONFIG_BACKEND_DEFAULT_METHOD: &str = "PRESERVE";
-pub const RUPID_CONFIG_BACKEND_DEFAULT_TIMEOUT: std::time::Duration =
+pub const RUPID_CONFIG_PROXY_BACKEND_DEFAULT_PORT: u16 = 80;
+pub const RUPID_CONFIG_PROXY_BACKEND_DEFAULT_USE_SSL: bool = false;
+pub const RUPID_CONFIG_PROXY_BACKEND_DEFAULT_METHOD: &str = "PRESERVE";
+pub const RUPID_CONFIG_PROXY_BACKEND_DEFAULT_TIMEOUT: std::time::Duration =
     std::time::Duration::from_millis(5000);
