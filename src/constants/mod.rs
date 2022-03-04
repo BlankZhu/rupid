@@ -1,4 +1,4 @@
-pub const RUPID_CONFIG_SERVER_DEFAULT_BIND_ADDRESS: [i32; 4] = [127, 0, 0, 1];
+pub const RUPID_CONFIG_SERVER_DEFAULT_BIND_ADDRESS: &str = "127.0.0.1";
 pub const RUPID_CONFIG_SERVER_DEFAULT_PORT: u16 = 7777;
 pub const RUPID_CONFIG_SERVER_DEFAULT_TIMEOUT: std::time::Duration =
     std::time::Duration::from_millis(7000);

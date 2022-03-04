@@ -33,25 +33,18 @@ async fn main() {
     };
     info!("using config: {:?}", conf);
 
-    let routes = httpbin_org_api();
-    let service = warp::service(routes);
-    let make_service = warp::hyper::service::make_service_fn(move |_| async move {
-        let service = tower::ServiceBuilder::new()
-            .layer(axum::error_handling::HandleErrorLayer::new(
-                handle_timeout_error,
-            ))
-            .timeout(std::time::Duration::from_millis(500))
-            .layer(tower_http::trace::TraceLayer::new_for_http())
-            .concurrency_limit(64)
-            .service(service);
+    let mut servers = Vec::new();
+    let mut handles = Vec::new();
+    for s in conf.servers {
+        let server = server::Server::new(s);
+        servers.push(server);
+    }
+    for server in servers {
+        let handle = tokio::spawn(async move { server.run().await });
+        handles.push(handle);
+    }
 
-        Ok::<_, std::convert::Infallible>(service)
-    });
-
-    warp::hyper::Server::bind(&([127, 0, 0, 1], 7777).into())
-        .serve(make_service)
-        .await
-        .unwrap();
+    futures::future::join_all(handles).await;
 }
 
 fn httpbin_org_api(
@@ -107,50 +100,6 @@ fn httpbin_org_build_request(
     request
         .headers_mut()
         .insert(http::header::HOST, "httpbin.org".parse().unwrap());
-    request
-}
-
-async fn httpbin_org_handler(
-    method: axum::http::Method,
-    axum::extract::Path(word): axum::extract::Path<String>,
-    headers: HeaderMap,
-    axum::extract::RawBody(body): axum::extract::RawBody,
-) -> http::Response<hyper::body::Body> {
-    let request = build_httpbin_org_request(method, format!("{}", word.as_str()), headers, body);
-    let client = hyper::Client::new();
-
-    if let Ok(upstream_response) = client.request(request).await {
-        let upstream_status = upstream_response.status();
-        let upstream_headers = upstream_response.headers().clone();
-        let upstream_body = upstream_response.into_body();
-
-        let mut response = http::Response::new(upstream_body);
-        *response.status_mut() = upstream_status;
-        *response.headers_mut() = upstream_headers;
-        response
-    } else {
-        http::Response::builder()
-            .status(http::StatusCode::SERVICE_UNAVAILABLE)
-            .body("proxy server unavailable".into())
-            .unwrap()
-    }
-}
-
-fn build_httpbin_org_request(
-    method: http::Method,
-    path: String,
-    headers: HeaderMap,
-    body: hyper::body::Body,
-) -> http::Request<hyper::body::Body> {
-    let uri = format!("http://httpbin.org:80/{}", path.as_str());
-    let mut request = http::Request::new(body);
-    *request.method_mut() = method;
-    *request.uri_mut() = uri.parse().unwrap();
-    *request.headers_mut() = headers;
-    request
-        .headers_mut()
-        .insert(http::header::HOST, "httpbin.org".parse().unwrap());
-
     request
 }
 

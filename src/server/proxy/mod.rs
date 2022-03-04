@@ -13,7 +13,7 @@ use hyper::{Body, Request, Response};
 use std::convert::Infallible;
 use tower::service_fn;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Proxy {
     entrances: Vec<entrance::Entrance>,
     // middlewares: Vec<Box<dyn middleware::Middleware>>,
