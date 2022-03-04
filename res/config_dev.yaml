@@ -10,7 +10,7 @@ servers:
           - name: test
             host: test.com
             method: GET
-            target: /
+            target: /httpbin/*1
         # middleware:
         #   - name: middleware-1
         #     parameters: k1=v1,k2=v2
@@ -22,7 +22,6 @@ servers:
             use_ssl: false
             # certificate: /path/to/certificate # use default cert
             method: GET
-            target: /get
     log:
       to_std_out: true
       to_file: false

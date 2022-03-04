@@ -56,16 +56,18 @@ impl Proxy {
     }
 
     fn add_route(&self, r: Router<Body>, e: Entrance, b: Backend) -> Router<Body> {
+        let entrance_layer = tower::ServiceBuilder::new().layer(e.clone()).service(b);
+
         match e.method.as_str() {
-            "DELETE" => r.route(e.target.as_str(), delete_service(b)),
-            "GET" => r.route(e.target.as_str(), get_service(b)),
-            "HEAD" => r.route(e.target.as_str(), head_service(b)),
-            "OPTIONS" => r.route(e.target.as_str(), options_service(b)),
-            "PATCH" => r.route(e.target.as_str(), patch_service(b)),
-            "POST" => r.route(e.target.as_str(), post_service(b)),
-            "PUT" => r.route(e.target.as_str(), put_service(b)),
-            "TRACE" => r.route(e.target.as_str(), trace_service(b)),
-            _ => r.route(e.target.as_str(), any_service(b)),
+            "DELETE" => r.route(e.target.as_str(), delete_service(entrance_layer)),
+            "GET" => r.route(e.target.as_str(), get_service(entrance_layer)),
+            "HEAD" => r.route(e.target.as_str(), head_service(entrance_layer)),
+            "OPTIONS" => r.route(e.target.as_str(), options_service(entrance_layer)),
+            "PATCH" => r.route(e.target.as_str(), patch_service(entrance_layer)),
+            "POST" => r.route(e.target.as_str(), post_service(entrance_layer)),
+            "PUT" => r.route(e.target.as_str(), put_service(entrance_layer)),
+            "TRACE" => r.route(e.target.as_str(), trace_service(entrance_layer)),
+            _ => r.route(e.target.as_str(), any_service(entrance_layer)),
         }
     }
 }

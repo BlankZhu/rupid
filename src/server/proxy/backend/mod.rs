@@ -24,7 +24,6 @@ pub struct Backend {
     use_ssl: bool,
     certificate: String,
     method: http::Method,
-    target: String,
 
     client: Client<HttpConnector>,
 }
@@ -72,7 +71,6 @@ impl Backend {
             use_ssl,
             certificate,
             method,
-            target: config.target,
 
             client: Client::builder().build_http(), // fixme: integrate it with timeout, keep-alive & concurrency limit
         }
@@ -101,16 +99,18 @@ impl Backend {
             false => "http",
         };
         let query = req.uri().query().map_or("", |q| q).to_string();
+        let target = req.uri().path().to_string();
         let mut headers = req.headers().clone();
         // fixme: carefully select header fields to override
         headers.insert(http::header::HOST, self.host.as_str().parse().unwrap());
+        debug!("old uri: {}", req.uri());
         let body = hyper::body::to_bytes(req).await?;
         let body = Body::from(body);
 
         let new_uri = uri::Builder::new()
             .scheme(scheme)
             .authority(format!("{}:{}", self.host.clone(), self.port.clone()))
-            .path_and_query(format!("{}?{}", self.target.clone(), query))
+            .path_and_query(format!("{}?{}", target, query))
             .build()?;
 
         debug!("using uri: {}", new_uri);
