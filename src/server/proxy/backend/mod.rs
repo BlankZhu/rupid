@@ -6,7 +6,7 @@ use http::uri;
 use hyper::client::HttpConnector;
 use hyper::service::Service;
 use hyper::{http, Body, Client, Request, Response, StatusCode};
-use log::{error, warn};
+use log::{debug, error, warn};
 use std::convert::Infallible;
 use std::pin::Pin;
 use std::str::FromStr;
@@ -110,9 +110,11 @@ impl Backend {
         let new_uri = uri::Builder::new()
             .scheme(scheme)
             .authority(format!("{}:{}", self.host.clone(), self.port.clone()))
-            .path_and_query(format!("{}{}", self.target.clone(), query))
+            .path_and_query(format!("{}?{}", self.target.clone(), query))
             .build()?;
 
+        debug!("using uri: {}", new_uri);
+        debug!("using headers: {:?}", headers);
         let mut new_request = Request::builder()
             .method(self.method.clone())
             .uri(new_uri)

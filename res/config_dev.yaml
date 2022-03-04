@@ -10,7 +10,7 @@ servers:
           - name: test
             host: test.com
             method: GET
-            target: /index.html
+            target: /
         # middleware:
         #   - name: middleware-1
         #     parameters: k1=v1,k2=v2
