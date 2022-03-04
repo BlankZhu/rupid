@@ -97,7 +97,7 @@ impl Backend {
 
     async fn exec(&self, req: Request<Body>) -> BackendResult<Response<Body>> {
         let scheme = match self.use_ssl {
-            ture => "https",
+            true => "https",
             false => "http",
         };
         let query = req.uri().query().map_or("", |q| q).to_string();
@@ -109,7 +109,7 @@ impl Backend {
 
         let new_uri = uri::Builder::new()
             .scheme(scheme)
-            .authority(format!("{}:{}", self.name.clone(), self.port.clone()))
+            .authority(format!("{}:{}", self.host.clone(), self.port.clone()))
             .path_and_query(format!("{}{}", self.target.clone(), query))
             .build()?;
 

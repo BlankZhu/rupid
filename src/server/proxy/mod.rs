@@ -57,69 +57,15 @@ impl Proxy {
 
     fn add_route(&self, r: Router<Body>, e: Entrance, b: Backend) -> Router<Body> {
         match e.method.as_str() {
-            "DELETE" => r.route(
-                e.target.as_str(),
-                delete_service(service_fn(|_: Request<Body>| async {
-                    let res = Response::new(Body::from("Hi from `GET /`"));
-                    Ok::<_, Infallible>(res)
-                })),
-            ),
-            "GET" => r.route(
-                e.target.as_str(),
-                get_service(service_fn(|_: Request<Body>| async {
-                    let res = Response::new(Body::from("Hi from `GET /`"));
-                    Ok::<_, Infallible>(res)
-                })),
-            ),
-            "HEAD" => r.route(
-                e.target.as_str(),
-                head_service(service_fn(|_: Request<Body>| async {
-                    let res = Response::new(Body::from("Hi from `GET /`"));
-                    Ok::<_, Infallible>(res)
-                })),
-            ),
-            "OPTIONS" => r.route(
-                e.target.as_str(),
-                options_service(service_fn(|_: Request<Body>| async {
-                    let res = Response::new(Body::from("Hi from `GET /`"));
-                    Ok::<_, Infallible>(res)
-                })),
-            ),
-            "PATCH" => r.route(
-                e.target.as_str(),
-                patch_service(service_fn(|_: Request<Body>| async {
-                    let res = Response::new(Body::from("Hi from `GET /`"));
-                    Ok::<_, Infallible>(res)
-                })),
-            ),
-            "POST" => r.route(
-                e.target.as_str(),
-                post_service(service_fn(|_: Request<Body>| async {
-                    let res = Response::new(Body::from("Hi from `GET /`"));
-                    Ok::<_, Infallible>(res)
-                })),
-            ),
-            "PUT" => r.route(
-                e.target.as_str(),
-                put_service(service_fn(|_: Request<Body>| async {
-                    let res = Response::new(Body::from("Hi from `GET /`"));
-                    Ok::<_, Infallible>(res)
-                })),
-            ),
-            "TRACE" => r.route(
-                e.target.as_str(),
-                trace_service(service_fn(|_: Request<Body>| async {
-                    let res = Response::new(Body::from("Hi from `GET /`"));
-                    Ok::<_, Infallible>(res)
-                })),
-            ),
-            _ => r.route(
-                e.target.as_str(),
-                any_service(service_fn(|_: Request<Body>| async {
-                    let res = Response::new(Body::from("Hi from `GET /`"));
-                    Ok::<_, Infallible>(res)
-                })),
-            ),
+            "DELETE" => r.route(e.target.as_str(), delete_service(b)),
+            "GET" => r.route(e.target.as_str(), get_service(b)),
+            "HEAD" => r.route(e.target.as_str(), head_service(b)),
+            "OPTIONS" => r.route(e.target.as_str(), options_service(b)),
+            "PATCH" => r.route(e.target.as_str(), patch_service(b)),
+            "POST" => r.route(e.target.as_str(), post_service(b)),
+            "PUT" => r.route(e.target.as_str(), put_service(b)),
+            "TRACE" => r.route(e.target.as_str(), trace_service(b)),
+            _ => r.route(e.target.as_str(), any_service(b)),
         }
     }
 }
