@@ -1,29 +1,73 @@
 servers:
-  - address: 127.0.0.1
-    port: 7777
+  - name: forward-proxy
+    address: 127.0.0.1
+    port: 80
     timeout: 5000
-    use_ssl: false
-    private_key: path/to/private/key
-    certificate: path/to/certificate
-    proxies:
-      - entrances:
-          - name: API-1
-            host: API-1.com
-            method: ALL
-            target: /api-1
-        middleware:
-          - name: middleware-1
-            parameters: k1=v1,k2=v2
-        backends:
-          - name: backend-1
-            host: backend-1.com
-            port: 443
-            timeout: 3000
-            user_ssl: true
-            certificate: /path/to/certificate
-            method: PRESERVE
-            target: /backend/api-1
-    log:
-      to_std_out: true
-      to_file: false
-      log_filename: path/to/log
+    entrances:
+      - name: any
+        host: PRESERVE
+    backends:
+      - name: any
+        location: remote
+        host: PRESERVE
+        port: 80
+        timeout: 3000
+  - name: reverse-proxy
+    address: 127.0.0.1
+    port: 443
+    timeout: 5000
+    tls:
+      version: tls_v1.3
+      private_key: path/to/private/key
+      certificate: path/to/certificate
+    entrances:
+      - name: API-1
+        host: API-1.com
+        method: ALL
+        target: /v1/api/
+      - name: API-2
+        host: API-2.com
+        method: GET
+        target: /v2/api/
+    middlewares:
+      - name: middleware-1
+        parameters: k1=v1,k2=v2
+    backendLB: weighted
+    backends:
+      - name: backend-1
+        location: remote
+        host: backend-1.com
+        port: 443
+        timeout: 3000
+        tls:
+          version: tls_v1.3
+          certificate: path/to/certificate
+        weight: 30
+        target: /api/
+      - name: backend-2
+        location: remote
+        host: backend-2.com
+        port: 80
+        timeout: 2000
+        weight: 70
+        target: /api/
+  - name: web-server
+    address: 127.0.0.1
+    port: 8080
+    timeout: 2000
+    tls:
+      version: tls_v1.3
+      private_key: path/to/private/key
+      certificate: path/to/certificate
+    entrances:
+      - name: rupid
+        host: rupid.com
+        method: ALL
+        target: /
+    backends:
+      - name: rupid
+        location: local
+        target: /local/path/
+log:
+  to_std_out: true
+  log_filename: path/to/log_dir/ # otherwise, no file log output
