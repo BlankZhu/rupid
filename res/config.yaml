@@ -1,28 +1,13 @@
-servers:
-  - name: SERVER_A # optional, has default
-    bind_address: 127.0.0.1 # optional, has default
-    port: 8080
-    protocol: https # tcp, tls, http, https
-    timeout: # optional, has default
-      readRequestTimeout: 3000 # in ms, optional, has default
-      writeResponseTimeout: 5000 # in ms, optional, has default
-    tls: # optional, enabled only if protocol is `tls` or `https`
-      mode: SIMPLE # or, MUTAL; optional, has default
-      private_key: PRIVATE-KEY-CONTENT
-      server_certificate: CERTIFICATE-CONTENT
-      root_certificate: CERTIFICATE-CONTENT
-      min_version: TLSV1_1
-      max_version: TLS_AUTO
-      httpsRedirect: true # enabled only if protocol is `https`
-    hosts:
-      - a.test.com
-      - b.test.com
-      - c.test.com
-    backends:
-      - test-backend
+log:
+  level: debug # trace, debug, info, warn, error, fatal
+  std:
+    enabled: true
+  file:
+    enabled: true
+    path: path/to/log_dir/
 middlewares:
-  tcp:  # todo
-  tls:  # todo
+  tcp: # todo
+  tls: # todo
   http:
     redirect:
       - name: redirect-1
@@ -43,7 +28,7 @@ middlewares:
       - name: retries-1
         attempts: 3
         perTryTimeout: 100 # ms
-        retryOn:  # `AND`
+        retryOn: # `AND`
           - 4XX
           - 5XX
           - TCP_ERROR
@@ -82,7 +67,29 @@ middlewares:
               - keyC
           - set:
               keyA: valueB
-backends:
+servers:
+  - name: SERVER_A # optional, has default
+    bind_address: 127.0.0.1 # optional, has default
+    port: 8080
+    protocol: https # tcp, tls, http, https
+    timeout: # optional, has default
+      readRequestTimeout: 3000 # in ms, optional, has default
+      writeResponseTimeout: 5000 # in ms, optional, has default
+    tls: # optional, enabled only if protocol is `tls` or `https`
+      mode: SIMPLE # or, MUTAL; optional, has default
+      private_key: PRIVATE-KEY-CONTENT
+      server_certificate: CERTIFICATE-CONTENT
+      root_certificate: CERTIFICATE-CONTENT
+      min_version: TLSV1_1
+      max_version: TLS_AUTO
+      httpsRedirect: true # enabled only if protocol is `https`
+    hosts:
+      - a.test.com
+      - b.test.com
+      - c.test.com
+    backends:
+      - test-backend
+services:
   - name: test-backend
     hosts:
       - a.test.com
@@ -144,10 +151,3 @@ backends:
               - fault-1
               - mirror-1
               - header-1
-log:
-  level: debug  # trace, debug, info, warn, error, fatal
-  std:
-    enabled: true
-  file:
-    enabled: true
-    path: path/to/log_dir/
