@@ -1,73 +1,153 @@
 servers:
-  - name: forward-proxy
-    address: 127.0.0.1
-    port: 80
-    timeout: 5000
-    entrances:
-      - name: any
-        host: PRESERVE
-    backends:
-      - name: any
-        location: remote
-        host: PRESERVE
-        port: 80
-        timeout: 3000
-  - name: reverse-proxy
-    address: 127.0.0.1
-    port: 443
-    timeout: 5000
-    tls:
-      version: tls_v1.3
-      private_key: path/to/private/key
-      certificate: path/to/certificate
-    entrances:
-      - name: API-1
-        host: API-1.com
-        method: ALL
-        target: /v1/api/
-      - name: API-2
-        host: API-2.com
-        method: GET
-        target: /v2/api/
-    middlewares:
-      - name: middleware-1
-        parameters: k1=v1,k2=v2
-    backendLB: weighted
-    backends:
-      - name: backend-1
-        location: remote
-        host: backend-1.com
-        port: 443
-        timeout: 3000
-        tls:
-          version: tls_v1.3
-          certificate: path/to/certificate
-        weight: 30
-        target: /api/
-      - name: backend-2
-        location: remote
-        host: backend-2.com
-        port: 80
-        timeout: 2000
-        weight: 70
-        target: /api/
-  - name: web-server
-    address: 127.0.0.1
+  - name: SERVER_A # optional, has default
+    bind_address: 127.0.0.1 # optional, has default
     port: 8080
-    timeout: 2000
-    tls:
-      version: tls_v1.3
-      private_key: path/to/private/key
-      certificate: path/to/certificate
-    entrances:
-      - name: rupid
-        host: rupid.com
-        method: ALL
-        target: /
+    protocol: https # tcp, tls, http, https
+    timeout: # optional, has default
+      readRequestTimeout: 3000 # in ms, optional, has default
+      writeResponseTimeout: 5000 # in ms, optional, has default
+    tls: # optional, enabled only if protocol is `tls` or `https`
+      mode: SIMPLE # or, MUTAL; optional, has default
+      private_key: PRIVATE-KEY-CONTENT
+      server_certificate: CERTIFICATE-CONTENT
+      root_certificate: CERTIFICATE-CONTENT
+      min_version: TLSV1_1
+      max_version: TLS_AUTO
+      httpsRedirect: true # enabled only if protocol is `https`
+    hosts:
+      - a.test.com
+      - b.test.com
+      - c.test.com
     backends:
-      - name: rupid
-        location: local
-        target: /local/path/
+      - test-backend
+middlewares:
+  tcp:  # todo
+  tls:  # todo
+  http:
+    redirect:
+      - name: redirect-1
+        uri: /new/path
+        authority: new.host.to.go.com
+        port: 8088
+        scheme: http
+        redirectCode: 301
+    rewrite:
+      - name: rewrite-1
+        uri: /new/path
+        authority: new.host.com
+    timeout:
+      - name: timeout-1
+        writeRequestTimeout: 3000 # ms
+        readResponseTimout: 3000 # ms
+    retries:
+      - name: retries-1
+        attempts: 3
+        perTryTimeout: 100 # ms
+        retryOn:  # `AND`
+          - 4XX
+          - 5XX
+          - TCP_ERROR
+    fault:
+      - name: fault-1
+        delay:
+          percentage: 0.5
+          time: 100 # ms
+        abort:
+          percentage: 0.5
+          httpStatus: 502
+    mirror:
+      - name: mirror-1
+        destination:
+          - a.mirror.com
+          - b.mirror.com
+    header:
+      - name: header-1
+        request:
+          - set:
+              keyA: valueA
+          - add:
+              keyA: valueA-1
+          - remove:
+              - keyB
+              - keyC
+          - set:
+              keyA: valueB
+        response:
+          - set:
+              keyA: valueA
+          - add:
+              keyA: valueA-1
+          - remove:
+              - keyB
+              - keyC
+          - set:
+              keyA: valueB
+backends:
+  - name: test-backend
+    hosts:
+      - a.test.com
+      - b.test.com
+    local: # optional
+      path: /path/to/web/dir # optional
+    tcp:
+      - route:
+          - destination: tcp.a.test.com
+            weight: 25
+          - destination: tcp.b.test.com
+            weight: 75
+    tls:
+      - match:
+          sniHosts:
+            - a.test.com
+        route:
+          - destination: tls.a.test.com
+      - match:
+          sniHosts:
+            - b.test.com
+            - c.test.com
+        route:
+          - destination: tls.b.test.com
+            weight: 50
+          - destination: tls.c.test.com
+            weight: 50
+    http:
+      - name: http-test-a
+        match: # linked in `AND`
+          - uri:
+              exact: /index.html
+              # prefix:
+              # regex:
+            scheme:
+              exact: http
+              # ...
+            method:
+              exact: get
+            authority:
+              exact: a.test.com
+            headers:
+              keyA:
+                exact: valueA
+              keyB:
+                exact: valueB
+            queries:
+              queryA:
+                exact: valueA
+            ignoreCase: true
+        route:
+          - destination: http.a.test.com
+            weight: 50
+            middlewares:
+              - redirect-1
+              - rewrite-1
+              - timeout-1
+              - retries-1
+              - fault-1
+              - mirror-1
+              - header-1
 log:
-  to_std_out: true
-  log_filename: path/to/log_dir/ # otherwise, no file log output
+  level: debug  # trace, debug, info, warn, error, fatal
+  std:
+    enabled: true
+  file:
+    enabled: true
+    path: path/to/log_dir/
