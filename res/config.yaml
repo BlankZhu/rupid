@@ -15,20 +15,20 @@ middlewares:
         authority: new.host.to.go.com
         port: 8088
         scheme: http
-        redirectCode: 301
+        redirect_code: 301
     rewrite:
       - name: rewrite-1
         uri: /new/path
         authority: new.host.com
     timeout:
       - name: timeout-1
-        writeRequestTimeout: 3000 # ms
-        readResponseTimout: 3000 # ms
+        write_request_timeout: 3000 # ms
+        read_response_timout: 3000 # ms
     retries:
       - name: retries-1
         attempts: 3
-        perTryTimeout: 100 # ms
-        retryOn: # `AND`
+        per_try_timeout: 100 # ms
+        retry_on: # `AND`
           - 4XX
           - 5XX
           - TCP_ERROR
@@ -39,7 +39,7 @@ middlewares:
           time: 100 # ms
         abort:
           percentage: 0.5
-          httpStatus: 502
+          http_status: 502
     mirror:
       - name: mirror-1
         destination:
@@ -73,8 +73,8 @@ servers:
     port: 8080
     protocol: https # tcp, tls, http, https
     timeout: # optional, has default
-      readRequestTimeout: 3000 # in ms, optional, has default
-      writeResponseTimeout: 5000 # in ms, optional, has default
+      read_timeout: 3000 # in ms, optional, has default
+      write_timeout: 5000 # in ms, optional, has default
     tls: # optional, enabled only if protocol is `tls` or `https`
       mode: SIMPLE # or, MUTAL; optional, has default
       private_key: PRIVATE-KEY-CONTENT
@@ -82,12 +82,12 @@ servers:
       root_certificate: CERTIFICATE-CONTENT
       min_version: TLSV1_1
       max_version: TLS_AUTO
-      httpsRedirect: true # enabled only if protocol is `https`
+      https_redirect: true # enabled only if protocol is `https`
     hosts:
       - a.test.com
       - b.test.com
       - c.test.com
-    backends:
+    services:
       - test-backend
 services:
   - name: test-backend
@@ -109,7 +109,7 @@ services:
         route:
           - destination: tls.a.test.com
       - match:
-          sniHosts:
+          sni_hosts:
             - b.test.com
             - c.test.com
         route:
@@ -139,7 +139,7 @@ services:
             queries:
               queryA:
                 exact: valueA
-            ignoreCase: true
+            ignore_case: true
         route:
           - destination: http.a.test.com
             weight: 50
