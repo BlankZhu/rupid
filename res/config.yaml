@@ -43,8 +43,8 @@ middlewares:
     mirror:
       - name: mirror-1
         destination:
-          - a.mirror.com
-          - b.mirror.com
+          host: mirror.a.com
+          port: 80
     header:
       - name: header-1
         request:
@@ -97,29 +97,29 @@ services:
     local: # optional
       path: /path/to/web/dir # optional
     tcp:
-      - route:
-          - destination: tcp.a.test.com
-            weight: 25
-          - destination: tcp.b.test.com
-            weight: 75
+      - host: tcp.a.test.com
+        port: 80
+        weight: 25
+      - host: tcp.b.test.com
+        port: 88
+        weight: 75
     tls:
       - match:
-          sniHosts:
-            - a.test.com
+          - a.test.com
         route:
-          - destination: tls.a.test.com
+          - host: tls.a.test.com
+        mode: SIMPLE # or MUTUAL, default SIMPLE
+
       - match:
-          sni_hosts:
-            - b.test.com
-            - c.test.com
+          - b.test.com
+          - c.test.com
         route:
-          - destination: tls.b.test.com
+          - host: tls.b.test.com
             weight: 50
-          - destination: tls.c.test.com
+          - host: tls.c.test.com
             weight: 50
     http:
-      - name: http-test-a
-        match: # linked in `AND`
+      - match: # linked in `AND`
           - uri:
               exact: /index.html
               # prefix:
@@ -141,7 +141,7 @@ services:
                 exact: valueA
             ignore_case: true
         route:
-          - destination: http.a.test.com
+          - host: http.a.test.com
             weight: 50
             middlewares:
               - redirect-1
