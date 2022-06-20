@@ -21,6 +21,10 @@ pub struct Server {
     /// TLS config, default empty
     pub tls: Option<TLS>,
 
+    /// redirect HTTP connection to HTTPS by returing a 301 response.
+    /// Default is false.
+    https_redirect: Option<bool>,
+
     /// hosts the server accepts
     pub hosts: Vec<String>,
 
@@ -59,8 +63,4 @@ pub struct TLS {
     /// maximum TLS version.
     /// TLS version includes: `TLS_AUTO`, `TLSV1_0`, `TLSV1_1`, `TLSV1_2` and `TLSV1_3`
     max_version: Option<String>,
-
-    /// redirect HTTP connection to HTTPS by returing a 301 response.
-    /// Default is false.
-    https_redirect: Option<bool>,
 }

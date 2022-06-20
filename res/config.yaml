@@ -71,18 +71,18 @@ servers:
   - name: SERVER_A # optional, has default
     bind_address: 127.0.0.1 # optional, has default
     port: 8080
-    protocol: https # tcp, tls, http, https
+    protocol: HTTP # TCP, TLS, HTTP, HTTP2, HTTP3
     timeout: # optional, has default
       read_timeout: 3000 # in ms, optional, has default
       write_timeout: 5000 # in ms, optional, has default
-    tls: # optional, enabled only if protocol is `tls` or `https`
+    tls: # optional, enabled only if protocol is `TLS` or `HTTP(2/3)`
       mode: SIMPLE # or, MUTAL; optional, has default
       private_key: PRIVATE-KEY-CONTENT
-      server_certificate: CERTIFICATE-CONTENT
+      certificate: CERTIFICATE-CONTENT
       root_certificate: CERTIFICATE-CONTENT
       min_version: TLSV1_1
       max_version: TLS_AUTO
-      https_redirect: true # enabled only if protocol is `https`
+    https_redirect: true # enabled only if `tls` enabled
     hosts:
       - a.test.com
       - b.test.com
@@ -108,8 +108,11 @@ services:
           - a.test.com
         route:
           - host: tls.a.test.com
-        mode: SIMPLE # or MUTUAL, default SIMPLE
-
+        config:
+          mode: SIMPLE # or MUTUAL/PASSTHROUGH, default SIMPLE
+          root_certificate: CA-BUNDLE-CONTENT
+          private_key: PRIVATE-KEY-CONTENT
+          certificate: CERTIFICATE-CONTENT
       - match:
           - b.test.com
           - c.test.com
@@ -151,3 +154,8 @@ services:
               - fault-1
               - mirror-1
               - header-1
+        tls:
+          mode: SIMPLE # or MUTUAL, default SIMPLE
+          root_certificate: CA-BUNDLE-CONTENT
+          private_key: PRIVATE-KEY-CONTENT
+          certificate: CERTIFICATE-CONTENT

@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use super::common::{Destination, StringMatch};
+use super::common::{Destination, StringMatch, TLSConfig};
 use serde::{Deserialize, Serialize};
 
 use super::common::Destination as TCPService;
@@ -40,6 +40,9 @@ pub struct TLSService {
 
     /// TLS upstream destination
     pub route: Vec<Destination>,
+
+    /// tls related config
+    pub config: TLSConfig,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
@@ -49,6 +52,9 @@ pub struct HTTPService {
 
     /// HTTP upstream destination
     pub route: Vec<Destination>,
+
+    /// tls related config
+    pub config: Option<TLSConfig>,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
