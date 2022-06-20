@@ -85,7 +85,7 @@ servers:
     http:
       min_version: HTTPV1_1
       max_version: HTTPV3_0
-      https_redirect: true # enabled only if `tls` enabled
+    https_redirect: true # enabled only if `tls` enabled
     hosts:
       - a.test.com
       - b.test.com
