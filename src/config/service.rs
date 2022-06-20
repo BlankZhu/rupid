@@ -31,6 +31,9 @@ pub struct Service {
 pub struct LocalService {
     /// path to content dir
     pub path: String,
+
+    /// http middlewares
+    pub middlewares: Option<Vec<String>>,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
@@ -55,6 +58,14 @@ pub struct HTTPService {
 
     /// tls related config
     pub config: Option<TLSConfig>,
+
+    /// http middlewares
+    pub middlewares: Option<Vec<String>>,
+
+    /// http version to upstream services
+    pub version: Option<String>,
+    // http keep alive, TODO
+    // pub keep_alive: Option<>,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]

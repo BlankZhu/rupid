@@ -14,3 +14,11 @@ pub struct Config {
     pub servers: Vec<server::Server>,
     pub services: Vec<service::Service>,
 }
+
+impl Config {
+    pub fn read_from_file(filename: &str) -> anyhow::Result<Config> {
+        let config_file = std::fs::File::open(filename)?;
+        let rupid_config: Config = serde_yaml::from_reader(config_file)?;
+        Ok(rupid_config)
+    }
+}

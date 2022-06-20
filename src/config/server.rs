@@ -49,8 +49,8 @@ pub struct TLS {
     /// private key content, PEM text
     pub private_key: String,
 
-    /// server certificate content, PEM text
-    pub server_certificate: String,
+    /// certificate content, PEM text
+    pub certificate: String,
 
     /// root certificate content, PEM text.
     /// Only used while mode is `MUTUAL`
@@ -63,4 +63,11 @@ pub struct TLS {
     /// maximum TLS version.
     /// TLS version includes: `TLS_AUTO`, `TLSV1_0`, `TLSV1_1`, `TLSV1_2` and `TLSV1_3`
     max_version: Option<String>,
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize)]
+pub struct HTTP {
+    pub min_version: Option<String>,
+    pub max_version: Option<String>,
+    // pub keep_alive: Option<>
 }

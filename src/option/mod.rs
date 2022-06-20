@@ -1,18 +1,14 @@
 use clap::Parser;
 
-#[derive(Debug, Parser)]
-// #[clap(version = "0.1", author = "BlankZhu")]
+#[derive(Parser, Debug)]
 #[clap(
     author = "BlankZhu",
     version = "0.1.0",
-    about = "rupid, a WIP API gateway"
+    about = "Rupid, a WIP rust gateway",
+    long_about = None
 )]
 pub struct Option {
-    #[clap(
-        short,
-        long,
-        default_value = "config.yaml",
-        // about = "rupid's config filename"
-    )]
+    /// config filename of Rupid
+    #[clap(short, long, default_value = "config.yaml", value_parser)]
     pub config_filename: String,
 }

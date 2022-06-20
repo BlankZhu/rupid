@@ -28,5 +28,5 @@ pub struct File {
     pub enabled: Option<bool>,
 
     /// path of the log file, default is `~` ($PWD)
-    pub path: Option<bool>,
+    pub path: Option<String>,
 }

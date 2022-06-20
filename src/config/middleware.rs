@@ -2,6 +2,8 @@ use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
 
+use super::common::Destination;
+
 /// describes the possible middlewares, including `tcp`, `tls` and `http`.
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Middlewares {
@@ -141,8 +143,11 @@ pub struct Abort {
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Mirror {
+    /// Name of the mirror middleware.
+    pub name: String,
+
     /// mirror traffic HTTP destination.
-    pub destination: Vec<String>,
+    pub destination: Destination,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]

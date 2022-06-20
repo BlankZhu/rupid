@@ -23,7 +23,7 @@ middlewares:
     timeout:
       - name: timeout-1
         write_request_timeout: 3000 # ms
-        read_response_timout: 3000 # ms
+        read_response_timeout: 3000 # ms
     retries:
       - name: retries-1
         attempts: 3
@@ -82,7 +82,10 @@ servers:
       root_certificate: CERTIFICATE-CONTENT
       min_version: TLSV1_1
       max_version: TLS_AUTO
-    https_redirect: true # enabled only if `tls` enabled
+    http:
+      min_version: HTTPV1_1
+      max_version: HTTPV3_0
+      https_redirect: true # enabled only if `tls` enabled
     hosts:
       - a.test.com
       - b.test.com
@@ -108,8 +111,9 @@ services:
           - a.test.com
         route:
           - host: tls.a.test.com
+            port: 30443
         config:
-          mode: SIMPLE # or MUTUAL/PASSTHROUGH, default SIMPLE
+          mode: MUTUAL # or MUTUAL/PASSTHROUGH, default SIMPLE
           root_certificate: CA-BUNDLE-CONTENT
           private_key: PRIVATE-KEY-CONTENT
           certificate: CERTIFICATE-CONTENT
@@ -119,8 +123,12 @@ services:
         route:
           - host: tls.b.test.com
             weight: 50
+            port: 30443
           - host: tls.c.test.com
             weight: 50
+            port: 30443
+        config:
+          mode: SIMPLE # or MUTUAL/PASSTHROUGH, default SIMPLE
     http:
       - match: # linked in `AND`
           - uri:
@@ -145,17 +153,17 @@ services:
             ignore_case: true
         route:
           - host: http.a.test.com
+            port: 80
             weight: 50
-            middlewares:
-              - redirect-1
-              - rewrite-1
-              - timeout-1
-              - retries-1
-              - fault-1
-              - mirror-1
-              - header-1
+        middlewares:
+          - redirect-1
+          - rewrite-1
+          - timeout-1
+          - retries-1
+          - fault-1
+          - mirror-1
+          - header-1
         tls:
-          mode: SIMPLE # or MUTUAL, default SIMPLE
-          root_certificate: CA-BUNDLE-CONTENT
-          private_key: PRIVATE-KEY-CONTENT
-          certificate: CERTIFICATE-CONTENT
+          mode: SIMPLE
+        version:
+        keep_alive:
