@@ -1,4 +1,4 @@
-mod config;
+pub mod config;
 pub mod constants;
 pub mod error;
 mod log;
