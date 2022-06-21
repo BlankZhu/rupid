@@ -4,7 +4,7 @@ mod error;
 mod option;
 mod types;
 
-use anyhow::Result;
+use anyhow::{Context, Result};
 use clap::Parser;
 
 use config::Config;
@@ -21,11 +21,16 @@ async fn main() -> Result<()> {
 
     // parse command line options
     let opt = Option::parse();
-    info!("Hello, Rupid! with option: {:?}", &opt);
 
     // read yaml config
-    let conf = Config::read_from_file(opt.config_filename.as_str())?;
-    info!("with config: {:?}", conf);
+    let conf = Config::read_from_file(opt.config_filename.as_str()).with_context(|| {
+        format!(
+            "Failed to read Rupid config from {}",
+            opt.config_filename.as_str()
+        )
+    })?;
+
+    info!("Rupid using config: {}", conf);
 
     Ok(())
 }

@@ -22,3 +22,13 @@ impl Config {
         Ok(rupid_config)
     }
 }
+
+impl std::fmt::Display for Config {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let res = serde_yaml::to_string(self);
+        match res {
+            Ok(str) => return write!(f, "{}", str),
+            Err(e) => return write!(f, "[INVALID YAML CONTENT]: {}", e),
+        }
+    }
+}
