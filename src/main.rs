@@ -1,14 +1,18 @@
 mod config;
 pub mod constants;
-mod error;
+pub mod error;
+mod log;
+mod middleware;
 mod option;
-mod types;
+mod server;
+mod service;
+pub mod types;
 
 use anyhow::{Context, Result};
 use clap::Parser;
 
+use ::log::info;
 use config::Config;
-use log::info;
 use option::Option;
 
 #[tokio::main]

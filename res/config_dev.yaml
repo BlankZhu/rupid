@@ -1,28 +1,32 @@
+log:
+  level: debug # trace, debug, info, warn, error, fatal
+  std:
+    enabled: true
+  file:
+    enabled: true
+    path: path/to/log_dir/
 servers:
-  - address: 127.0.0.1
-    port: 7777
-    timeout: 5000
-    use_ssl: false
-    # private_key: path/to/private/key
-    # certificate: path/to/certificate
-    proxies:
-      - entrances:
-          - name: test
-            host: test.com
-            method: GET
-            target: /httpbin/*1
-        # middleware:
-        #   - name: middleware-1
-        #     parameters: k1=v1,k2=v2
-        backends:
-          - name: httpbin
-            host: httpbin.org
+  - name: SERVER_A
+    bind_address: 127.0.0.1
+    port: 8080
+    protocol: HTTP # TCP, TLS, HTTP, HTTP2, HTTP3
+    timeout: # optional, has default
+      read_timeout: 3000 # in ms, optional, has default
+      write_timeout: 5000 # in ms, optional, has default
+    hosts:
+      - www.my-httpbin.org
+    services:
+      - httpbin
+services:
+  - name: httpbin
+    hosts:
+      - www.my-httpbin.org
+      - www.my-httpbin2.org
+    http:
+      - match: # linked in `AND`
+          - scheme:
+              exact: http
+        route:
+          - host: httpbin.org
             port: 80
-            timeout: 3000
-            use_ssl: false
-            # certificate: /path/to/certificate # use default cert
-            method: GET
-    log:
-      to_std_out: true
-      to_file: false
-      log_filename: path/to/log
+            weight: 100
