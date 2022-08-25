@@ -36,5 +36,10 @@ async fn main() -> Result<()> {
 
     info!("Rupid using config: {}", conf);
 
+    // setup logger
+    // setup service
+    // setup middleware
+    // setup server
+
     Ok(())
 }
